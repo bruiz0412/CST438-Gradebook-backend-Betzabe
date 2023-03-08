@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,6 +57,7 @@ public class GradeBookController {
 		}
 		return result;
 	}
+	
 	
 	@GetMapping("/gradebook/{id}")
 	public GradebookDTO getGradebook(@PathVariable("id") Integer assignmentId  ) {
@@ -169,5 +171,39 @@ public class GradeBookController {
 		
 		return assignment;
 	}
+	
+//	@PostMapping("/addAssignment")
+//	public String newAssignment(String email, String assignName, date dueDate) {
+//		// check that user is the course instructor
+//		if (!assignment.getCourse().getInstructor().equals(email)) {
+//			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Not Authorized. " );
+//		}
+//		
+//		return assignment;	
+//	}
+	@DeleteMapping("/gradebook/{id}")
+	@Transactional
+	public void deleteAssignment(@PathVariable Integer id) {
+		
+		Assignment assignment = assignmentRepository.findById(id).orElse(null);
+		
+		//CHECKS IF ASSIGNMENT EXISTS 
+		if (assignment == null) {
+			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Assignment not found. "+id );
+		}
+		
+//		//CHECKS IF THE EMAIL MATCHED THE COURSE PROFESSOR. 
+//		if (!assignment.getCourse().getInstructor().equals(email)) {
+//			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Not Authorized. " );
+//		}
+//		
+		//IF THE ASSIGNMENT HASNT GOTTEN GRADED 
+		if(assignment.getNeedsGrading() == 1) {
+			assignmentRepository.delete(assignment); 
+	
+		}
+	}
+	
+	
 
 }
