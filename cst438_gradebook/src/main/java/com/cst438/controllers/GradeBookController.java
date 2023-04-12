@@ -1,5 +1,6 @@
 package com.cst438.controllers;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,6 +29,7 @@ import com.cst438.domain.CourseRepository;
 import com.cst438.domain.Enrollment;
 import com.cst438.domain.GradebookDTO;
 import com.cst438.services.RegistrationService;
+
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:3000","http://localhost:3001"})
@@ -158,6 +161,32 @@ public class GradeBookController {
 		
 	}
 	
+	@PutMapping("/updateGradebook/{id}")
+	@Transactional
+	public void updateAssignmentName(@RequestBody GradebookDTO gradebook, @PathVariable("id") int id) {
+		// display in body in postman all columns of assignment table
+		
+		//String email = "dwisneski@csumb.edu";  // user name (should be instructor's email) 
+		//checkAssignment(assignmentId, email);  // check that user name matches instructor email of the course.
+		
+		//Assignment assignment = assignmentRepository.findById(id).orElse(null);
+		Assignment assignment = new Assignment(); 
+		assignment.setId(id); 
+		
+		//CHECKS IF ASSIGNMENT EXISTS 
+		if (assignment.getId() != id){
+			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Assignment not found. "+id);
+			
+		}else {
+			//assignment.setName(name);
+
+		}
+		
+		 
+		
+		
+	}
+	
 	private Assignment checkAssignment(int assignmentId, String email) {
 		// get assignment 
 		Assignment assignment = assignmentRepository.findById(assignmentId).orElse(null);
@@ -172,36 +201,35 @@ public class GradeBookController {
 		return assignment;
 	}
 	
-//	@PostMapping("/addAssignment")
-//	public String newAssignment(String email, String assignName, date dueDate) {
-//		// check that user is the course instructor
-//		if (!assignment.getCourse().getInstructor().equals(email)) {
-//			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Not Authorized. " );
-//		}
-//		
-//		return assignment;	
-//	}
+	@PostMapping("/addAssignment")
+	public Assignment newAssignment(@RequestParam("assignName") String assignName, @RequestParam("dueDate") String dueDate) {
+		
+		Assignment assignment = new Assignment();
+		assignment.setName(assignName); 
+		assignment.setDueDate(Date.valueOf(dueDate)); 
+		
+		assignmentRepository.save(assignment); 
+		
+		return assignment; 
+	}
+	
 	@DeleteMapping("/gradebook/{id}")
 	@Transactional
-	public void deleteAssignment(@PathVariable Integer id) {
+	public void deleteAssignment(@PathVariable int id){
 		
 		Assignment assignment = assignmentRepository.findById(id).orElse(null);
 		
 		//CHECKS IF ASSIGNMENT EXISTS 
 		if (assignment == null) {
-			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Assignment not found. "+id );
+			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Assignment not found. "+id);
 		}
 		
-//		//CHECKS IF THE EMAIL MATCHED THE COURSE PROFESSOR. 
-//		if (!assignment.getCourse().getInstructor().equals(email)) {
-//			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Not Authorized. " );
-//		}
-//		
 		//IF THE ASSIGNMENT HASNT GOTTEN GRADED 
 		if(assignment.getNeedsGrading() == 1) {
 			assignmentRepository.delete(assignment); 
-	
 		}
+		// MAKE SURE THAT NO ASSIGNEMTNHAS A GRADE BC IF IT HAS A GRADE UNDER ASSIGNMENT_GRADE IT WONT DELETE. 
+	
 	}
 	
 	
