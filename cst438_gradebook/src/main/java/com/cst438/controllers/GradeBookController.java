@@ -201,18 +201,52 @@ public class GradeBookController {
 		return assignment;
 	}
 	
+	// ASSIGNMENT 2 - ADDING A NEW ASSIGNMENT WITH NAME AND DATE 
 	@PostMapping("/addAssignment")
-	public Assignment newAssignment(@RequestParam("assignName") String assignName, @RequestParam("dueDate") String dueDate) {
+	public Assignment newAssignment(@RequestParam("assignName") String assignName, @RequestParam("dueDate") String dueDate,@RequestParam("courseId") int courseId) {
+		String userEmail = "dwisneski@csumb.edu";
+		// validate course and that the course instructor is the user
+		Course c = courseRepository.findById(courseId).orElse(null);
 		
-		Assignment assignment = new Assignment();
-		assignment.setName(assignName); 
-		assignment.setDueDate(Date.valueOf(dueDate)); 
-		
-		assignmentRepository.save(assignment); 
-		
-		return assignment; 
+		if (c != null && c.getInstructor().equals(userEmail)) {
+			// create and save new assignment
+			// update and return dto with new assignment primary key
+			Assignment a = new Assignment();
+			a.setCourse(c);
+			a.setName(assignName);
+			a.setDueDate(Date.valueOf(dueDate));
+			a.setNeedsGrading(1);
+			a = assignmentRepository.save(a);
+
+			return a;
+			
+		} else {
+			throw new ResponseStatusException( 
+                           HttpStatus.BAD_REQUEST, 
+                          "Invalid course id.");
+		}
+ 
 	}
 	
+	// ASSIGNMENT 2 - CHANGING ASSIGNMENT NAME  
+	@PutMapping("assignment/{assignmentId}")
+	@Transactional
+	public void updateAssignmentName(@PathVariable int assignmentId, @RequestBody String name, String email){
+		
+		Assignment assignment = checkAssignment(assignmentId, email);
+		
+		if (!assignment.getCourse().getInstructor().equals(email)) {
+			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Not Authorized. " );
+		}	
+		
+		if(!(assignment == null)) {
+			assignment.setName(name); 
+			assignmentRepository.save(assignment); 
+		}
+	}
+	
+	
+	// ASSIGNMENT 2 - DELETING ASSIGNMENT THAT STILL NEEDS GRADING. 
 	@DeleteMapping("/gradebook/{id}")
 	@Transactional
 	public void deleteAssignment(@PathVariable int id){
@@ -231,6 +265,9 @@ public class GradeBookController {
 		// MAKE SURE THAT NO ASSIGNEMTNHAS A GRADE BC IF IT HAS A GRADE UNDER ASSIGNMENT_GRADE IT WONT DELETE. 
 	
 	}
+	
+	
+
 	
 	
 
