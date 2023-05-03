@@ -58,6 +58,7 @@ public class GradeBookController {
 		for (Assignment a: assignments) {
 			result.assignments.add(new AssignmentListDTO.AssignmentDTO(a.getId(), a.getCourse().getCourse_id(), a.getName(), a.getDueDate().toString() , a.getCourse().getTitle()));
 		}
+		
 		return result;
 	}
 	
@@ -197,6 +198,8 @@ public class GradeBookController {
 		if (!assignment.getCourse().getInstructor().equals(email)) {
 			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Not Authorized. " );
 		}
+		
+		
 		
 		return assignment;
 	}

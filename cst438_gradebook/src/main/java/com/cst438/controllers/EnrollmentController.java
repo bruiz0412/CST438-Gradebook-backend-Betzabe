@@ -14,6 +14,7 @@ import com.cst438.domain.Enrollment;
 import com.cst438.domain.EnrollmentDTO;
 import com.cst438.domain.EnrollmentRepository;
 
+
 @RestController
 public class EnrollmentController {
 
@@ -33,8 +34,19 @@ public class EnrollmentController {
 		
 		//TODO  complete this method in homework 4
 		
-		return null;
+		Enrollment enrollment = new Enrollment();
+		enrollment.setStudentName(enrollmentDTO.studentName);
+		enrollment.setStudentEmail(enrollmentDTO.studentEmail);
 		
+		Course course = courseRepository.findById(enrollmentDTO.course_id).orElse(null);
+		if( course == null) {
+			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Course Id was not found.");
+		}
+		enrollment.setCourse(course);
+		enrollment = enrollmentRepository.save(enrollment);
+		
+		enrollmentDTO.id = enrollment.getId();
+		return enrollmentDTO;
 	}
 
 }
