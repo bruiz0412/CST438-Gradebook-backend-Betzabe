@@ -46,6 +46,15 @@ public class RegistrationServiceMQ extends RegistrationService {
 		
 		//TODO  complete this method in homework 4
 		
+		Course course  = courseRepository.findById(enrollmentDTO.course_id).orElse(null);
+		Enrollment enrollment = new Enrollment();
+
+		enrollment.setCourse(course);
+		enrollment.setStudentEmail(enrollmentDTO.studentEmail);
+		enrollment.setStudentName(enrollmentDTO.studentName);
+
+		enrollmentRepository.save(enrollment);
+		
 	}
 
 	// sender of messages to Registration Service
