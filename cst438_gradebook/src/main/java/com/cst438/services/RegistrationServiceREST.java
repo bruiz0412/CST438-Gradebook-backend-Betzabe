@@ -27,6 +27,5 @@ public class RegistrationServiceREST extends RegistrationService {
 		restTemplate.put(registration_url + "/course/" + course_id, courseDTO);
 		
 		System.out.println("Post sending final grades");
-		
 	}
 }

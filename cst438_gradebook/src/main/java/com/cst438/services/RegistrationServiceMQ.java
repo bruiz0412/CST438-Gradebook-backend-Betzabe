@@ -54,7 +54,6 @@ public class RegistrationServiceMQ extends RegistrationService {
 		enrollment.setStudentName(enrollmentDTO.studentName);
 
 		enrollmentRepository.save(enrollment);
-		
 	}
 
 	// sender of messages to Registration Service
